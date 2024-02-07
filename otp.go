@@ -67,7 +67,7 @@ This is the base implenation, the input here can be used for TOP (Time based) or
 func (o OTP) Generate(input int) string {
 
 	hmac := hmac.New(o.hashFunc, []byte(o.secret))
-	buf := Itob(input)
+	buf := itob(input)
 
 	hmac.Write(buf)
 	hmacData := hmac.Sum(nil)
@@ -89,7 +89,7 @@ func truncate(input []byte, codeLength int) int {
 	return code
 }
 
-func Itob(integer int) []byte {
+func itob(integer int) []byte {
 	byteArr := make([]byte, 8)
 	binary.BigEndian.PutUint64(byteArr, uint64(integer))
 	return byteArr
