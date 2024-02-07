@@ -66,7 +66,6 @@ func TestHTOPValidate(t *testing.T) {
 	// Define the secret and initial counter for the server and client instances
 	secret := []byte("12345678901234567890") // Sample secret, replace with actual secret
 	serverCounter := 0
-	clientCounter := 0
 
 	// Create server and client instances of hopt with the same secret and initial counters
 	serverConfig := basicOTP.HOTPConfig{
@@ -75,42 +74,11 @@ func TestHTOPValidate(t *testing.T) {
 		Secret:     secret,
 		Counter:    serverCounter,
 	}
-	serverHTOP := basicOTP.NewHTOP(serverConfig)
-
-	clientConfig := basicOTP.HOTPConfig{
-		CodeLength: 6,
-		HashType:   basicOTP.SHA1,
-		Secret:     secret,
-		Counter:    clientCounter,
-	}
-	clientHTOP := basicOTP.NewHTOP(clientConfig)
+	hotp := basicOTP.NewHTOP(serverConfig)
 
 	for _, tc := range testCases {
-
-		previousServerCounter := serverHTOP.Counter
-		previousClientCounter := clientHTOP.Counter
-
-		// Generate the OTP for the current test case on the server side
-		clientOTPCode := clientHTOP.Generate()
-
-		// Validate the OTP on the client side
-		valid := serverHTOP.Validate(clientOTPCode)
-
-		// Ensure the validation result matches the expectation
-		if valid && clientOTPCode != tc.Expected {
-			t.Errorf("Validation failed for count %d, expected %s, got %s", tc.Counter, tc.Expected, clientOTPCode)
-		} else if !valid && clientOTPCode == tc.Expected {
-			t.Errorf("Validation passed for count %d, expected validation to fail", tc.Counter)
-		}
-
-		// Ensure the server counter is updated correctly after validation
-		if valid && serverHTOP.Counter != previousServerCounter+1 {
-			t.Errorf("Server counter not updated correctly after validation for count %d", tc.Counter)
-		}
-
-		// The client counter should incremented even if rejected
-		if !valid && clientHTOP.Counter != previousClientCounter {
-			t.Errorf("Client counter not updated correctly after failing validation. Got %d Expected %d", clientHTOP.Counter, previousClientCounter+1)
+		if !hotp.Validate(tc.Expected) {
+			t.Errorf("Failed to validate code: %s, counter: %d", tc.Expected, hotp.Counter)
 		}
 	}
 }
@@ -138,6 +106,72 @@ func TestHTOPInvalidCodes(t *testing.T) {
 		t.Run(fmt.Sprintf("Count_%d", tc.Counter), func(t *testing.T) {
 			if hopt.Validate(tc.Input) != false {
 				t.Errorf("Failed to validate input Expected: %v, Got: %v", false, true)
+			}
+		})
+	}
+}
+
+func TestHOTPSuccessfulValidationOfOutOfSync(t *testing.T) {
+
+	/*
+		The test cases are valid for C=0, setting C=-3 represents
+		the server is 3 codes behind the client. The Sync limit is 10
+		so all codes should be valid.
+	*/
+	config := basicOTP.HOTPConfig{
+		CodeLength:           6,
+		HashType:             basicOTP.SHA1,
+		Secret:               []byte("12345678901234567890"), // Sample secret, replace with actual secret
+		Counter:              -3,
+		SynchronizationLimit: 10,
+	}
+	hopt := basicOTP.NewHTOP(config)
+
+	for _, tc := range testCases {
+		t.Run(fmt.Sprintf("Count_%d", tc.Counter), func(t *testing.T) {
+			result := hopt.Validate(tc.Expected)
+
+			// Check if the forward lookup worked and returned true
+			if !result {
+				t.Error("Validation failed, forward look up did not work")
+			}
+
+			// Ensure the server synced with the client
+			if result && hopt.Counter != tc.Counter {
+				t.Errorf("The counter was not synced correctly, Expected %d, Got: %d", 0, hopt.Counter)
+			}
+
+			// Pass all other validations after sync
+			if !hopt.Validate(tc.Expected) {
+				t.Error("Validation failed after sync")
+			}
+		})
+	}
+}
+
+func TestHOTPSFailedValidationOfOutOfSync(t *testing.T) {
+
+	/*
+		The test cases are valid for C=0, setting C=-300 represents
+		the server is 300 codes behind the client. The Sync limit is 10
+		so all codes should be invalid.
+	*/
+	config := basicOTP.HOTPConfig{
+		CodeLength:           6,
+		HashType:             basicOTP.SHA1,
+		Secret:               []byte("12345678901234567890"), // Sample secret, replace with actual secret
+		Counter:              -300,
+		SynchronizationLimit: 10,
+	}
+	hopt := basicOTP.NewHTOP(config)
+
+	for _, tc := range testCases {
+		t.Run(fmt.Sprintf("Count_%d", tc.Counter), func(t *testing.T) {
+			result := hopt.Validate(tc.Expected)
+
+			// Check if the forward lookup worked and returned true
+			if result {
+				t.Error("Validation failed, did not stop forward lookup")
 			}
 		})
 	}
