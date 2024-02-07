@@ -41,20 +41,20 @@ func TestHTOPGenerate(t *testing.T) {
 		Secret:     []byte("12345678901234567890"), // Sample secret, replace with actual secret
 		Counter:    0,
 	}
-	htop := basicOTP.NewHTOP(config)
+	hopt := basicOTP.NewHTOP(config)
 
 	for _, tc := range testCases {
 		t.Run(fmt.Sprintf("Count_%d", tc.Counter), func(t *testing.T) {
-			generated := htop.Generate()
+			generated := hopt.Generate()
 
 			// Validate the generated code for a specific counter
 			if generated != tc.Expected {
 				t.Errorf("Expected: %s, Got: %s", tc.Expected, generated)
 			}
 
-			// Validate the htop counter has increased
-			if htop.Counter != tc.Counter+1 {
-				t.Errorf("HTOP did not increment, Expected: %d, Got %d", htop.Counter, tc.Counter)
+			// Validate the hopt counter has increased
+			if hopt.Counter != tc.Counter+1 {
+				t.Errorf("HTOP did not increment, Expected: %d, Got %d", hopt.Counter, tc.Counter)
 			}
 
 		})
@@ -68,7 +68,7 @@ func TestHTOPValidate(t *testing.T) {
 	serverCounter := 0
 	clientCounter := 0
 
-	// Create server and client instances of htop with the same secret and initial counters
+	// Create server and client instances of hopt with the same secret and initial counters
 	serverConfig := basicOTP.HOTPConfig{
 		CodeLength: 6,
 		HashType:   basicOTP.SHA1,
