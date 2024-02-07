@@ -114,3 +114,23 @@ func TestHTOPValidate(t *testing.T) {
 		}
 	}
 }
+
+func TesHOPTURI(t *testing.T) {
+	secretKey := []byte("Hello!")
+
+	hotpConfig := basicOTP.HOTPConfig{
+		CodeLength: 4,
+		HashType:   basicOTP.SHA1,
+		Secret:     secretKey,
+		Counter:    12,
+	}
+
+	hopt := basicOTP.NewHTOP(hotpConfig)
+
+	expectedURI := "otpauth://totp/TEST:alice@google.com?secret=JBSWY3DPEE&issuer=Example&algorithm=SHA1&digits=4&counter=12"
+	result := hopt.URI("TEST:alice@google.com", "Example")
+	if result != expectedURI {
+		t.Errorf("Expected %s, Got %s", expectedURI, result)
+	}
+
+}

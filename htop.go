@@ -52,10 +52,11 @@ func (t *hopt) URI(label string, issuer string) string {
 	encodedLabel := url.PathEscape(label)
 
 	// Construct the URI
-	return fmt.Sprintf("otpauth://hopt/%s?secret=%s&issuer=%s&algorithm=%s&digits=%d",
+	return fmt.Sprintf("otpauth://hopt/%s?secret=%s&issuer=%s&algorithm=%s&digits=%d&counter=%d",
 		encodedLabel,
 		encodedSecret,
 		encodedIssuer,
 		t.otp.hashType,
-		t.otp.codeLength)
+		t.otp.codeLength,
+		t.Counter)
 }
