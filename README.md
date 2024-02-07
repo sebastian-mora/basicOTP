@@ -18,6 +18,7 @@ The BasicOTP library aims to simplify the generation and validation of one-time 
 - **Configurable Hash Algorithms**: Users can choose from different hash algorithms including SHA1, SHA256, and SHA512 according to their security requirements.
 - **Customizable Code Length**: BasicOTP allows customization of the length of generated OTP codes to meet specific application needs.
 - **URI Generation**: BasicOTP provides a convenient method for generating URIs according to the Google Authenticator Key URI Format, facilitating integration with OTP token apps.
+- **Synchronization in HOTP Validation**: BasicOTP supports synchronization in HOTP validation, allowing the Validate() function to look ahead and fast forward the counter to the client's counter if a valid token is found.
 
 ## Use Cases
 
@@ -29,15 +30,15 @@ BasicOTP is suitable for a variety of use cases including:
 
 ## Dependencies
 
-BasicOTP is built using Go and leverages GO standard cryptographic libraries for hash functions and HMAC calculation. It is compatible with modern Go development environments and has no third part dependencies.
+BasicOTP is built using Go and leverages Go standard cryptographic libraries for hash functions and HMAC calculation. It is compatible with modern Go development environments and has no third-party dependencies.
 
 ## Installation
 
 To use BasicOTP in your Go project, you can import it using Go modules:
 
-```bash
-go get github.com/sebatian-mora/basicOTP
-```
+````bash
+go get github.com/sebastian-mora/basicOTP
+
 
 ## Example
 
@@ -76,4 +77,4 @@ func main() {
 
 }
 
-```
+````
