@@ -36,9 +36,9 @@ BasicOTP is built using Go and leverages Go standard cryptographic libraries for
 
 To use BasicOTP in your Go project, you can import it using Go modules:
 
-````bash
+```go
 go get github.com/sebastian-mora/basicOTP
-
+```
 
 ## Example
 
@@ -77,4 +77,4 @@ func main() {
 
 }
 
-````
+```
