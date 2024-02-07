@@ -45,7 +45,7 @@ package main
 
 import (
     "fmt"
-    "github.com/sebatian-mora/basicOTP"
+    "github.com/sebastian-mora/basicOTP"
 )
 
 func main() {
