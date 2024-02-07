@@ -20,6 +20,24 @@ func TestOTPLength(t *testing.T) {
 	}
 }
 
+func TestOTPPanic(t *testing.T) {
+	defer func() {
+		if r := recover(); r == nil {
+			t.Errorf("The code did not panic")
+		}
+	}()
+
+	basicOTP.NewOTP(nil, basicOTP.SHA1, 6)
+}
+
+func TestOTPDefaultCodeLen(t *testing.T) {
+	otp := basicOTP.NewOTP([]byte("test"), basicOTP.SHA1, 0)
+
+	if len(otp.Generate(123)) != 6 {
+		t.Error("OTP Default code length was not set to 6")
+	}
+}
+
 func TestOTPConsistency(t *testing.T) {
 	secretKey := []byte("test")
 	codeLength := 6
@@ -73,5 +91,15 @@ func TestOTPRandomness(t *testing.T) {
 	output2 := otp.Generate(2)
 	if output1 == output2 {
 		t.Errorf("Different inputs produce the same TOTP. Input 1: %s, Input 2: %s", output1, output2)
+	}
+}
+
+func TestNewOTPDefaultHash(t *testing.T) {
+	// Pass an invalid hashType
+	otp := basicOTP.NewOTP([]byte("mysecret"), basicOTP.HashType("fake-hash"), 6)
+
+	// Verify that sha1.New is used as the default hash function
+	if otp.HashType != basicOTP.SHA1 {
+		t.Errorf("Expected default hash function to be sha1, got %v", otp.HashType)
 	}
 }

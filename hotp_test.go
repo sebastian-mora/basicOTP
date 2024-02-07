@@ -115,6 +115,34 @@ func TestHTOPValidate(t *testing.T) {
 	}
 }
 
+func TestHTOPInvalidCodes(t *testing.T) {
+	var testCases = []struct {
+		Counter  int
+		Input    string
+		Expected bool
+	}{
+		{0, "755223", false}, // off by one
+		{0, "aaaaaa", false},
+		{99, "755223", false}, // off by one
+	}
+
+	config := basicOTP.HOTPConfig{
+		CodeLength: 6,
+		HashType:   basicOTP.SHA1,
+		Secret:     []byte("12345678901234567890"), // Sample secret, replace with actual secret
+		Counter:    0,
+	}
+	hopt := basicOTP.NewHTOP(config)
+
+	for _, tc := range testCases {
+		t.Run(fmt.Sprintf("Count_%d", tc.Counter), func(t *testing.T) {
+			if hopt.Validate(tc.Input) != false {
+				t.Errorf("Failed to validate input Expected: %v, Got: %v", false, true)
+			}
+		})
+	}
+}
+
 func TestHOPTURI(t *testing.T) {
 	secretKey := []byte("Hello!")
 

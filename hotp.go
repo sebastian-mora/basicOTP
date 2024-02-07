@@ -59,7 +59,7 @@ func (t *hotp) URI(label string, issuer string) string {
 		encodedLabel,
 		encodedSecret,
 		encodedIssuer,
-		t.otp.hashType,
-		t.otp.codeLength,
+		t.otp.HashType,
+		t.otp.CodeLength,
 		t.Counter)
 }

@@ -140,7 +140,7 @@ func TestValidate(t *testing.T) {
 	}
 }
 
-func TesTOTPURI(t *testing.T) {
+func TestTOTPURI(t *testing.T) {
 	secretKey := []byte("Hello!")
 
 	totpConfig := basicOTP.TOTPConfig{
@@ -158,4 +158,16 @@ func TesTOTPURI(t *testing.T) {
 		t.Errorf("Expected %s, Got %s", expectedURI, result)
 	}
 
+}
+
+func TestTOTPDefaultTimeInterval(t *testing.T) {
+	topt := basicOTP.NewTOTP(basicOTP.TOTPConfig{
+		CodeLength: 6,
+		HashType:   basicOTP.SHA1,
+		Secret:     []byte("Hello!"),
+	})
+
+	if topt.TimePeriod != 30 {
+		t.Error("TOPT default time period was not set to 30 seconds")
+	}
 }

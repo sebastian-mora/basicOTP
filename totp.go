@@ -10,7 +10,7 @@ import (
 // TOTP represents a Time-based One-Time Password generator.
 type TOTP struct {
 	otp        OTP
-	timePeriod int
+	TimePeriod int
 }
 
 // TOTPConfig holds configuration parameters for TOTP generation.
@@ -24,22 +24,14 @@ type TOTPConfig struct {
 // NewTOTP creates a new instance of TOTP based on the provided configuration.
 func NewTOTP(config TOTPConfig) *TOTP {
 
-	if len(config.Secret) <= 0 {
-		panic("a secret must be provided for TOTP")
-	}
-
 	if config.TimeInterval == 0 {
 		// Set default time to 30 seconds, recommended in rfc6238
 		config.TimeInterval = 30
 	}
 
-	if config.CodeLength == 0 {
-		config.CodeLength = 6
-	}
-
 	return &TOTP{
 		otp:        NewOTP(config.Secret, config.HashType, config.CodeLength),
-		timePeriod: config.TimeInterval,
+		TimePeriod: config.TimeInterval,
 	}
 }
 
@@ -81,11 +73,11 @@ func (t *TOTP) URI(label string, issuer string) string {
 		encodedLabel,
 		encodedSecret,
 		encodedIssuer,
-		t.otp.hashType,
-		t.otp.codeLength)
+		t.otp.HashType,
+		t.otp.CodeLength)
 }
 
 // timecode calculates the timecode based on the provided Unix timestamp.
 func (t *TOTP) timecode(unixTimeStamp int64) int {
-	return int(unixTimeStamp) / t.timePeriod
+	return int(unixTimeStamp) / t.TimePeriod
 }
