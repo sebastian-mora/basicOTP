@@ -9,23 +9,22 @@ import (
 
 // TOTP represents a Time-based One-Time Password generator.
 type TOTP struct {
-	otp        OTP
-	TimePeriod int
+	otp        OTP // otp is the underlying OTP generator.
+	TimePeriod int // TimePeriod is the time period in seconds used for TOTP generation.
 }
 
 // TOTPConfig holds configuration parameters for TOTP generation.
 type TOTPConfig struct {
-	TimeInterval int
-	CodeLength   int
-	HashType     HashType
-	Secret       []byte
+	TimeInterval int      // TimeInterval is the time interval in seconds for TOTP generation.
+	CodeLength   int      // CodeLength is the length of the generated TOTP code.
+	HashType     HashType // HashType is the hash algorithm used for TOTP generation.
+	Secret       []byte   // Secret is the shared secret key used for TOTP generation.
 }
 
 // NewTOTP creates a new instance of TOTP based on the provided configuration.
 func NewTOTP(config TOTPConfig) *TOTP {
-
 	if config.TimeInterval == 0 {
-		// Set default time to 30 seconds, recommended in rfc6238
+		// Set the default time interval to 30 seconds, recommended in RFC 6238.
 		config.TimeInterval = 30
 	}
 
@@ -42,7 +41,7 @@ func (t *TOTP) Generate() string {
 	return t.otp.Generate(int(timecode))
 }
 
-// Generate generates a TOTP for the given Unix timestamp.
+// GenerateAt generates a TOTP for the given Unix timestamp.
 func (t *TOTP) GenerateAt(unixTimeStamp int64) string {
 	timeCode := int(t.timecode(unixTimeStamp))
 	return t.otp.Generate(timeCode)
@@ -53,7 +52,7 @@ func (t *TOTP) Validate(code string) bool {
 	return t.Generate() == code
 }
 
-// ValidateAt validates a TOTP against a given unix timestamp.
+// ValidateAt validates a TOTP against a given Unix timestamp.
 func (t *TOTP) ValidateAt(unixTimestamp int64, code string) bool {
 	return t.GenerateAt(unixTimestamp) == code
 }
@@ -77,7 +76,7 @@ func (t *TOTP) URI(label string, issuer string) string {
 		t.otp.CodeLength)
 }
 
-// timecode calculates the timecode based on the provided Unix timestamp.
+// timecode calculates the timecode based on the provided Unix timestamp and the TimePeriod.
 func (t *TOTP) timecode(unixTimeStamp int64) int {
 	return int(unixTimeStamp) / t.TimePeriod
 }

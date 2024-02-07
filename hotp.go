@@ -6,8 +6,8 @@ import (
 	"net/url"
 )
 
-// hotp represents a Sequence-based One-Time Password generator.
-type hotp struct {
+// HTOP represents a Sequence-based One-Time Password generator.
+type HTOP struct {
 	otp                  OTP
 	Counter              int
 	synchronizationLimit int
@@ -28,31 +28,37 @@ type HOTPConfig struct {
 }
 
 // NewHTOP creates a new instance of hopt based on the provided HOTPConfig.
-func NewHTOP(config HOTPConfig) *hotp {
+func NewHTOP(config HOTPConfig) *HTOP {
 
-	return &hotp{
+	return &HTOP{
 		otp:                  NewOTP(config.Secret, config.HashType, config.CodeLength),
 		Counter:              config.Counter,
 		synchronizationLimit: config.SynchronizationLimit,
 	}
 }
 
-// Generate generates a HOTP code.
-func (h *hotp) Generate() string {
+// Generate returns a string representing a HOTP code.
+// generating a code increments the HOTP counter
+func (h *HTOP) Generate() string {
 	code := h.otp.Generate(h.Counter)
 	h.Counter = h.Counter + 1
 	return code
 }
 
 // Validate validates an input OTP code against the current counter value.
-func (h *hotp) Validate(input string) bool {
-	// If synchronization limit is 0 or negative, perform a single validation
-	if h.synchronizationLimit <= 0 && h.otp.Generate(h.Counter) == input {
+// the function will attempt to look ahead for codes using
+// synchronizationLimit as the upper bound.
+func (h *HTOP) Validate(input string) bool {
+
+	// first check if input matches the current counter
+	if h.otp.Generate(h.Counter) == input {
 		h.Counter++
 		return true
 	}
 
-	for i := 0; i < h.synchronizationLimit; i++ {
+	// If we did not match, look ahead and sync if needed.
+	// i=1 as we have checked the first index already
+	for i := 1; i < h.synchronizationLimit; i++ {
 		if h.otp.Generate(h.Counter+i) == input {
 			h.Counter += i // Fast-forward counter to sync
 			return true
@@ -64,7 +70,7 @@ func (h *hotp) Validate(input string) bool {
 
 // URI generates the URI according to the Google Authenticator Key URI Format.
 // See: https://github.com/google/google-authenticator/wiki/Key-Uri-Format
-func (t *hotp) URI(label string, issuer string) string {
+func (t *HTOP) URI(label string, issuer string) string {
 	// Encode secret in Base32 without padding
 	encodedSecret := base32.StdEncoding.WithPadding(base32.NoPadding).EncodeToString(t.otp.secret)
 
