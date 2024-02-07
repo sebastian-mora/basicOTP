@@ -1,8 +1,10 @@
-package basicOTP
+package basicOTP_test
 
 import (
 	"fmt"
 	"testing"
+
+	"github.com/sebastian-mora/basicOTP"
 )
 
 /*
@@ -33,13 +35,13 @@ var testCases = []struct {
 }
 
 func TestHTOPGenerate(t *testing.T) {
-	config := HOTPConfig{
+	config := basicOTP.HOTPConfig{
 		CodeLength: 6,
-		HashType:   SHA1,
+		HashType:   basicOTP.SHA1,
 		Secret:     []byte("12345678901234567890"), // Sample secret, replace with actual secret
 		Counter:    0,
 	}
-	htop := NewHTOP(config)
+	htop := basicOTP.NewHTOP(config)
 
 	for _, tc := range testCases {
 		t.Run(fmt.Sprintf("Count_%d", tc.Counter), func(t *testing.T) {
@@ -67,45 +69,48 @@ func TestHTOPValidate(t *testing.T) {
 	clientCounter := 0
 
 	// Create server and client instances of htop with the same secret and initial counters
-	serverConfig := HOTPConfig{
+	serverConfig := basicOTP.HOTPConfig{
 		CodeLength: 6,
-		HashType:   SHA1,
+		HashType:   basicOTP.SHA1,
 		Secret:     secret,
 		Counter:    serverCounter,
 	}
-	serverHTOP := NewHTOP(serverConfig)
+	serverHTOP := basicOTP.NewHTOP(serverConfig)
 
-	clientConfig := HOTPConfig{
+	clientConfig := basicOTP.HOTPConfig{
 		CodeLength: 6,
-		HashType:   SHA1,
+		HashType:   basicOTP.SHA1,
 		Secret:     secret,
 		Counter:    clientCounter,
 	}
-	clientHTOP := NewHTOP(clientConfig)
+	clientHTOP := basicOTP.NewHTOP(clientConfig)
 
 	for _, tc := range testCases {
 
+		previousServerCounter := serverHTOP.Counter
+		previousClientCounter := clientHTOP.Counter
+
 		// Generate the OTP for the current test case on the server side
-		otp := serverHTOP.otp.Generate(tc.Counter)
+		clientOTPCode := clientHTOP.Generate()
 
 		// Validate the OTP on the client side
-		valid := clientHTOP.Validate(otp)
+		valid := serverHTOP.Validate(clientOTPCode)
 
 		// Ensure the validation result matches the expectation
-		if valid && otp != tc.Expected {
-			t.Errorf("Validation failed for count %d, expected %s, got %s", tc.Counter, tc.Expected, otp)
-		} else if !valid && otp == tc.Expected {
+		if valid && clientOTPCode != tc.Expected {
+			t.Errorf("Validation failed for count %d, expected %s, got %s", tc.Counter, tc.Expected, clientOTPCode)
+		} else if !valid && clientOTPCode == tc.Expected {
 			t.Errorf("Validation passed for count %d, expected validation to fail", tc.Counter)
 		}
 
-		// Ensure the client counter is updated correctly after validation
-		if valid && clientHTOP.Counter != tc.Counter+1 {
-			t.Errorf("Client counter not updated correctly after validation for count %d", tc.Counter)
+		// Ensure the server counter is updated correctly after validation
+		if valid && serverHTOP.Counter != previousServerCounter+1 {
+			t.Errorf("Server counter not updated correctly after validation for count %d", tc.Counter)
 		}
 
-		// Ensure the server counter remains unchanged after validation on the client side
-		if valid && serverHTOP.Counter != serverCounter {
-			t.Errorf("Server counter should remain unchanged after validation on the client side")
+		// The client counter should incremented even if rejected
+		if !valid && clientHTOP.Counter != previousClientCounter {
+			t.Errorf("Client counter not updated correctly after failing validation. Got %d Expected %d", clientHTOP.Counter, previousClientCounter+1)
 		}
 	}
 }

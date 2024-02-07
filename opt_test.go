@@ -1,15 +1,17 @@
-package basicOTP
+package basicOTP_test
 
 import (
 	"strconv"
 	"testing"
+
+	"github.com/sebastian-mora/basicOTP"
 )
 
 func TestOTPLength(t *testing.T) {
 	secretKey := []byte("test")
 	codeLength := 6
 
-	otp := NewOTP(secretKey, SHA1, codeLength)
+	otp := basicOTP.NewOTP(secretKey, basicOTP.SHA1, codeLength)
 
 	// Check the length of the generated TOTP
 	output := otp.Generate(2)
@@ -22,7 +24,7 @@ func TestOTPConsistency(t *testing.T) {
 	secretKey := []byte("test")
 	codeLength := 6
 
-	otp := NewOTP(secretKey, SHA1, codeLength)
+	otp := basicOTP.NewOTP(secretKey, basicOTP.SHA1, codeLength)
 
 	// Check for consistency by generating multiple OTPs with the same input
 	for i := 0; i < 5; i++ {
@@ -38,7 +40,7 @@ func TestOTPNumericFormat(t *testing.T) {
 	secretKey := []byte("test")
 	codeLength := 6
 
-	otp := NewOTP(secretKey, SHA1, codeLength)
+	otp := basicOTP.NewOTP(secretKey, basicOTP.SHA1, codeLength)
 
 	// Check that the OTP consists only of numeric characters
 	output := otp.Generate(2)
@@ -51,7 +53,7 @@ func TestOTPNonZeroInput(t *testing.T) {
 	secretKey := []byte("test")
 	codeLength := 6
 
-	otp := NewOTP(secretKey, SHA1, codeLength)
+	otp := basicOTP.NewOTP(secretKey, basicOTP.SHA1, codeLength)
 
 	// Verify that generating an OTP with a non-zero input produces a non-empty result
 	nonZeroOutput := otp.Generate(1)
@@ -64,7 +66,7 @@ func TestOTPRandomness(t *testing.T) {
 	secretKey := []byte("test")
 	codeLength := 6
 
-	otp := NewOTP(secretKey, SHA1, codeLength)
+	otp := basicOTP.NewOTP(secretKey, basicOTP.SHA1, codeLength)
 
 	// Confirm that generating OTPs with different inputs results in different OTPs
 	output1 := otp.Generate(1)

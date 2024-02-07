@@ -66,15 +66,17 @@ func (t *TOTP) ValidateAt(unixTimestamp int64, code string) bool {
 	return t.GenerateAt(unixTimestamp) == code
 }
 
-// https://github.com/google/google-authenticator/wiki/Key-Uri-Format
+// URI generates the URI for the TOTP according to the Google Authenticator Key URI Format.
+// See: https://github.com/google/google-authenticator/wiki/Key-Uri-Format
 func (t *TOTP) URI(label string, issuer string) string {
 	// Encode secret in Base32 without padding
 	encodedSecret := base32.StdEncoding.WithPadding(base32.NoPadding).EncodeToString(t.otp.secret)
 
 	// URL encode issuer and label
-	encodedIssuer := url.QueryEscape(issuer)
-	encodedLabel := url.QueryEscape(label)
+	encodedIssuer := url.PathEscape(issuer)
+	encodedLabel := url.PathEscape(label)
 
+	// Construct the URI
 	return fmt.Sprintf("otpauth://totp/%s?secret=%s&issuer=%s&algorithm=%s&digits=%d",
 		encodedLabel,
 		encodedSecret,
