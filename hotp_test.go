@@ -80,6 +80,11 @@ func TestHTOPValidate(t *testing.T) {
 		if !hotp.Validate(tc.Expected) {
 			t.Errorf("Failed to validate code: %s, counter: %d", tc.Expected, hotp.Counter)
 		}
+
+		// ensure the counter incrementing
+		if hotp.Counter != tc.Counter+1 {
+			t.Errorf("Counter did not increment Got: %d, Expected: %d", hotp.Counter, tc.Counter)
+		}
 	}
 }
 
@@ -141,10 +146,6 @@ func TestHOTPSuccessfulValidationOfOutOfSync(t *testing.T) {
 				t.Errorf("The counter was not synced correctly, Expected %d, Got: %d", 0, hopt.Counter)
 			}
 
-			// Pass all other validations after sync
-			if !hopt.Validate(tc.Expected) {
-				t.Error("Validation failed after sync")
-			}
 		})
 	}
 }
