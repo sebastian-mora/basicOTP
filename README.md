@@ -1,6 +1,6 @@
 # BasicOTP
 
-BasicOTP is a Go library for generating and validating one-time passwords (OTP). It provides implementations for both Time-based One-Time Passwords (TOTP) and Sequence-based One-Time Passwords (HTOP).
+BasicOTP is a Go library for generating and validating one-time passwords (OTP). It provides implementations for both Time-based One-Time Passwords (TOTP) and Sequence-based One-Time Passwords (HOTP).
 
 This library is my own implementation based on the RFC specifications. However, it's important to note that I do not recommend using this library for production purposes without thorough auditing and testing.
 
@@ -10,13 +10,13 @@ Adding such a disclaimer is essential to clarify that while the library provides
 
 The BasicOTP library aims to simplify the generation and validation of one-time passwords in Go applications. It consists of three main components:
 
-1. **HTOP**: Represents a Sequence-based One-Time Password generator.
+1. **HOTP**: Represents a Sequence-based One-Time Password generator.
 2. **TOTP**: Represents a Time-based One-Time Password generator.
 3. **OTP**: Provides the underlying functionality for generating and validating one-time passwords.
 
 ## Features
 
-- **Support for TOTP and HTOP**: BasicOTP supports both Time-based (TOTP) and Sequence-based (HTOP) OTP generation and validation.
+- **Support for TOTP and HOTP**: BasicOTP supports both Time-based (TOTP) and Sequence-based (HOTP) OTP generation and validation.
 - **Configurable Hash Algorithms**: Users can choose from different hash algorithms including SHA1, SHA256, and SHA512 according to their security requirements.
 - **Customizable Code Length**: BasicOTP allows customization of the length of generated OTP codes to meet specific application needs.
 - **URI Generation**: BasicOTP provides a convenient method for generating URIs according to the Google Authenticator Key URI Format, facilitating integration with OTP token apps.
