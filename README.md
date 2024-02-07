@@ -39,22 +39,23 @@ go get github.com/sebatian-mora/basicOTP
 
 ## Example
 
-``go
+```go
+
 package main
 
 import (
-"fmt"
-"github.com/sebatian-mora/basicOTP"
+    "fmt"
+    "github.com/sebatian-mora/basicOTP"
 )
 
 func main() {
-// Create a new TOTP instance
-totp := basicOTP.NewTOTP(basicOTP.TOTPConfig{
-TimeInterval: 30, // Time interval in seconds (default is 30 seconds)
-CodeLength: 6, // Length of generated OTP code (default is 6)
-HashType: basicOTP.SHA1, // Hash algorithm (SHA1, SHA256, or SHA512)
-Secret: []byte("mysecret"),
-})
+    // Create a new TOTP instance
+    totp := basicOTP.NewTOTP(basicOTP.TOTPConfig{
+        TimeInterval: 30, // Time interval in seconds (default is 30 seconds)
+        CodeLength: 6, // Length of generated OTP code (default is 6)
+        HashType: basicOTP.SHA1, // Hash algorithm (SHA1, SHA256, or SHA512)
+        Secret: []byte("mysecret"),
+    })
 
     // Generate a TOTP code
     code := totp.Generate()
@@ -72,7 +73,5 @@ Secret: []byte("mysecret"),
     fmt.Println("TOTP URI:", uri)
 
 }
-
-```
 
 ```
