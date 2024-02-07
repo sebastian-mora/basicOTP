@@ -2,6 +2,10 @@
 
 BasicOTP is a Go library for generating and validating one-time passwords (OTP). It provides implementations for both Time-based One-Time Passwords (TOTP) and Sequence-based One-Time Passwords (HTOP).
 
+This library is my own implementation based on the RFC specifications. However, it's important to note that I do not recommend using this library for production purposes without thorough auditing and testing.
+
+Adding such a disclaimer is essential to clarify that while the library provides functionality based on established standards, it may still have limitations or potential issues that need to be addressed before being used in a production environment.
+
 ## Overview
 
 The BasicOTP library aims to simplify the generation and validation of one-time passwords in Go applications. It consists of three main components:
@@ -25,9 +29,9 @@ BasicOTP is suitable for a variety of use cases including:
 - **Secure Transaction Authorization**: Generating OTPs for authorizing sensitive transactions or operations in financial or enterprise systems.
 - **Passwordless Authentication**: Using OTPs as an alternative to traditional password-based authentication for improved security and user experience.
 
-## Tech Stack
+## Dependencies
 
-BasicOTP is built using Go and leverages standard cryptographic libraries for hash functions and HMAC calculation. It is compatible with modern Go development environments and integrates seamlessly into existing projects using Go modules.
+BasicOTP is built using Go and leverages GO standard cryptographic libraries for hash functions and HMAC calculation. It is compatible with modern Go development environments and has no third part dependencies.
 
 ## Installation
 
